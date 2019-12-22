@@ -1,6 +1,6 @@
 ## Table to Struct 工具 
 
-将mysql表结构自动映射成标准po文件，节省时间
+将mysql表结构自动映射成标准xorm po层文件，节省时间
 
 ### Usage
 ```
