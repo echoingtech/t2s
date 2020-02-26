@@ -30,6 +30,7 @@ func main() {
 		user,pswd string
 		host, port string
 		outPath string
+		packageName string
 	)
 
 
@@ -46,6 +47,8 @@ func main() {
 	flag.StringVar(&tableName, "t", tableName, "表名")
 
 	flag.StringVar(&outPath, "out", outPath, "生成文件地址,不指定则不生成")
+
+	flag.StringVar(&packageName, "package", "po", "生成文件的packageName")
 
 	flag.StringVar(&configType, "c", ConfigTypeApollo, "配置类型 apollo (从apollo读取mysql配置)  dsn (自定义mysql配置)")
 
@@ -104,6 +107,10 @@ func main() {
 		t2s := src.NewTable2Struct()
 		if len(outPath) > 0 {
 			t2s.SavePath(outPath)
+		}
+		
+		if len(packageName) > 0 {
+			t2s.PackageName(packageName)
 		}
 
 		err := t2s.Dsn(mysqlStr).
