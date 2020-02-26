@@ -30,11 +30,13 @@ Usage of t2s:
 
 ### Example
 ```
+自动生成payment库refund表的映射文件
+
 从apollo读取Mysql配置
 
 t2s -db payment -t refund -out ./refund.go
 
-自定义mysql配置
+自定义Mysql配置
 
 t2s -c dsn -H 127.0.0.1 -P 3306 -db payment -t refund -u username -p password -out ./refund.go
 
