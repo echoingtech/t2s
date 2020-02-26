@@ -11,9 +11,9 @@
 ```
 Usage of t2s:
   -H string
-    	mysql host (dsn必传模式)
+    	mysql host (自定义必传模式)
   -P string
-    	mysql port (dsn必传模式)
+    	mysql port (自定义必传模式)
   -c string
     	配置类型 apollo (从apollo读取mysql配置)  dsn (自定义mysql配置) (default "apollo")
   -db string
@@ -21,11 +21,11 @@ Usage of t2s:
   -out string
     	生成文件地址,不指定则不生成, 直接输出到终端
   -p string
-    	mysql password (dsn必传模式)
+    	mysql password (自定义必传模式)
   -t string
     	表名
   -u string
-    	mysql username (dsn必传模式)
+    	mysql username (自定义必传模式)
 ```
 
 ### Example
