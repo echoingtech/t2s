@@ -116,7 +116,6 @@ func main() {
 		}
 	}()
 
-
 }
 
 func LoadFromApollo(mysqlName string) (string, error) {
