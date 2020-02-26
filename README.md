@@ -19,9 +19,11 @@ Usage of t2s:
   -db string
     	数据库名
   -out string
-    	生成文件地址,不指定则不生成, 直接输出到终端
+    	生成文件地址,不指定则不生成,直接输出到终端
   -p string
     	mysql password (自定义必传模式)
+  -package string
+    	生成文件的packageName (default "po")
   -t string
     	表名
   -u string

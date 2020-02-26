@@ -108,7 +108,7 @@ func main() {
 		if len(outPath) > 0 {
 			t2s.SavePath(outPath)
 		}
-		
+
 		if len(packageName) > 0 {
 			t2s.PackageName(packageName)
 		}
