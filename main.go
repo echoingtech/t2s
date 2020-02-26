@@ -43,7 +43,7 @@ func main() {
 
 	flag.StringVar(&dbName, "db", dbName, "数据库名")
 
-	flag.StringVar(&tableName, "t", tableName, "表名字")
+	flag.StringVar(&tableName, "t", tableName, "表名")
 
 	flag.StringVar(&outPath, "out", outPath, "生成文件地址,不指定则不生成")
 
