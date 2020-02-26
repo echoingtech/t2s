@@ -1,30 +1,44 @@
 ## Table to Struct 工具 
 
-将mysql表结构自动映射成标准xorm po层文件，节省时间
+将mysql表结构自动映射成标准xorm po层文件，节省时间  
+支持自定义mysql连接串和直接从apollo读取
 
 ### Usage
 ```
-package main
-
-import (
-	"fmt"
-
-	"github.com/echoingtech/t2s/src"
-)
-
-func main() {
-	err := src.NewTable2Struct().SavePath("./model/model.go").   //输出文件
-		Dsn("user_im:7nJd*JL0FxZFPqfB@tcp(rm-uf6f0jy4vg5ua2bsu.mysql.rds.aliyuncs.com)/svc-im?charset=utf8"). //mysql 连接串
-		Table("cbd_goods").  //表名
-		PackageName("mysql"). //package
-		Run()
-
-	fmt.Println(err)
-}
-
-
+ go install -a  github.com/echoingtech/t2s
 ```
 
+```
+Usage of t2s:
+  -H string
+    	mysql host (dsn必传模式)
+  -P string
+    	mysql port (dsn必传模式)
+  -c string
+    	配置类型 apollo (从apollo读取mysql配置)  dsn (自定义mysql配置) (default "apollo")
+  -db string
+    	数据库名
+  -out string
+    	生成文件地址,不指定则不生成
+  -p string
+    	mysql password (dsn必传模式)
+  -t string
+    	表名
+  -u string
+    	mysql username (dsn必传模式)
+```
+
+### Example
+```
+从apollo读取Mysql配置
+
+t2s -db payment -t refund -out ./refund.go
+
+自定义mysql配置
+
+t2s -c dsn -H 127.0.0.1 -P 3306 -db payment -t refund -u username -p password -out ./refund.go
+
+```
 ### Result
 ```
 package mysql
