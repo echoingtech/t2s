@@ -120,7 +120,7 @@ func (t *Table2Struct) EnableJsonTag(p bool) *Table2Struct {
 }
 
 func (t *Table2Struct) Run() error {
-	fmt.Println("start convert table")
+	fmt.Println("\n\n ************************************************** start convert table ************************************************** \n\n")
 
 	// 链接mysql, 获取db对象
 	t.dialMysql()
@@ -163,7 +163,7 @@ func (t *Table2Struct) Run() error {
 			}
 			tableName = str
 		}
-		fmt.Println("convert table", tableName)
+		//fmt.Println("convert table", tableName)
 		depth := 1
 		structContent += "type " + tableName + " struct {\n"
 		for _, v := range item {
@@ -192,7 +192,6 @@ func (t *Table2Struct) Run() error {
 				tab(depth), tableRealName)
 			structContent += "}\n\n"
 		}
-		fmt.Println(structContent)
 	}
 
 	// 如果有引入 time.Time, 则需要引入 time 包
@@ -200,11 +199,17 @@ func (t *Table2Struct) Run() error {
 	if strings.Contains(structContent, "time.Time") {
 		importContent = "import \"time\"\n\n"
 	}
+	fmt.Println(packageName)
+	fmt.Println(importContent)
+	fmt.Println(structContent)
+
+	fmt.Println("\n\n ************************************************** end convert table ************************************************** \n\n")
 
 	// 写入文件struct
 	var savePath = t.savePath
 	// 是否指定保存路径
 	if savePath == "" {
+		return nil
 		savePath = "model.go"
 	}
 	filePath := fmt.Sprintf("%s", savePath)
