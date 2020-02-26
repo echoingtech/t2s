@@ -115,7 +115,7 @@ func main() {
 
 		err := t2s.Dsn(mysqlStr).
 			Table(tableName).
-			PackageName("po").
+			PackageName(packageName).
 			Run()
 
 		if err != nil {
