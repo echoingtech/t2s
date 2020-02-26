@@ -42,6 +42,7 @@ t2s -c dsn -H 127.0.0.1 -P 3306 -db payment -t refund -u username -p password -o
 
 ```
 ### Result
+夸张的使用了以前开发遇到的一张奇葩表，这张表促使了这个工具的诞生
 ```
 package mysql
 
