@@ -34,7 +34,7 @@ Usage of t2s:
 ```
 自动生成payment库refund表的映射文件
 
-从apollo读取Mysql配置
+从apollo读取Mysql配置（需要内网环境）
 
 t2s -db payment -t refund -out ./refund.go
 
