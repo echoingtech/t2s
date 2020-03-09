@@ -61,7 +61,7 @@ type Table2Struct struct {
 	dsn            string
 	savePath       string
 	db             *sql.DB
-	table          string
+	tables         string
 	prefix         string
 	err            error
 	realNameMethod string
@@ -104,8 +104,8 @@ func (t *Table2Struct) DB(d *sql.DB) *Table2Struct {
 	return t
 }
 
-func (t *Table2Struct) Table(tab string) *Table2Struct {
-	t.table = tab
+func (t *Table2Struct) Tables(tab string) *Table2Struct {
+	t.tables = tab
 	return t
 }
 
@@ -120,7 +120,8 @@ func (t *Table2Struct) EnableJsonTag(p bool) *Table2Struct {
 }
 
 func (t *Table2Struct) Run() error {
-	fmt.Println("\n\n ************************************************** start convert table ************************************************** \n\n")
+
+	tables := strings.Split(t.tables, ",")
 
 	// 链接mysql, 获取db对象
 	t.dialMysql()
@@ -128,102 +129,128 @@ func (t *Table2Struct) Run() error {
 		return t.err
 	}
 
-	// 获取表和字段的shcema
-	tableColumns, err := t.getColumns()
-	if err != nil {
-		return err
-	}
+	for _, inputTableName := range tables {
 
-	// 包名
-	var packageName string
-	if t.packageName == "" {
-		packageName = "package mysql\n\n"
-	} else {
-		packageName = fmt.Sprintf("package %s\n\n", t.packageName)
-	}
+		fmt.Println(fmt.Sprintf("\n\n ************************************************** start convert %s ************************************************** \n\n", inputTableName))
 
-	// 组装struct
-	var structContent string
-	for tableRealName, item := range tableColumns {
-		// 去除前缀
-		if t.prefix != "" {
-			tableRealName = tableRealName[len(t.prefix):]
+		tableName := strings.Replace(inputTableName, " ", "", -1)
+		tableName = strings.Replace(tableName, "\n", "", -1)
+
+		// 获取表和字段的shcema
+		tableColumns, err := t.getColumns(tableName)
+		if err != nil {
+			return err
 		}
-		tableName := tableRealName
 
-		switch len(tableName) {
-		case 0:
-		case 1:
-			tableName = strings.ToUpper(tableName[0:1])
-		default:
-			var str string
-			tableNames := strings.Split(tableName, "_")
-			for _, name := range tableNames {
-				str += strings.ToUpper(name[0:1]) + name[1:]
+		// 包名
+		var packageName string
+		if t.packageName == "" {
+			packageName = "package mysql\n\n"
+		} else {
+			packageName = fmt.Sprintf("package %s\n\n", t.packageName)
+		}
+
+		// 组装struct
+		var structContent string
+		for tableRealName, item := range tableColumns {
+			// 去除前缀
+			if t.prefix != "" {
+				tableRealName = tableRealName[len(t.prefix):]
 			}
-			tableName = str
-		}
-		//fmt.Println("convert table", tableName)
-		depth := 1
-		structContent += "type " + tableName + " struct {\n"
-		for _, v := range item {
-			//structContent += tab(depth) + v.ColumnName + " " + v.Type + " " + v.Json + "\n"
-			// 字段注释
-			var clumnComment string
-			if v.ColumnComment != "" {
-				clumnComment = fmt.Sprintf(" // %s", v.ColumnComment)
+			tableName := tableRealName
+
+			switch len(tableName) {
+			case 0:
+			case 1:
+				tableName = strings.ToUpper(tableName[0:1])
+			default:
+				var str string
+				tableNames := strings.Split(tableName, "_")
+				for _, name := range tableNames {
+					str += strings.ToUpper(name[0:1]) + name[1:]
+				}
+				tableName = str
 			}
-			structContent += fmt.Sprintf("%s%s %s %s%s\n",
-				tab(depth), v.ColumnName, v.Type, v.Tag, clumnComment)
-		}
-		structContent += tab(depth-1) + "}\n\n"
+			//fmt.Println("convert tables", tableName)
+			depth := 1
+			structContent += "type " + tableName + " struct {\n"
+			for _, v := range item {
+				//structContent += tab(depth) + v.ColumnName + " " + v.Type + " " + v.Json + "\n"
+				// 字段注释
+				var clumnComment string
+				if v.ColumnComment != "" {
+					clumnComment = fmt.Sprintf(" // %s", v.ColumnComment)
+				}
+				structContent += fmt.Sprintf("%s%s %s %s%s\n",
+					tab(depth), v.ColumnName, v.Type, v.Tag, clumnComment)
+			}
+			structContent += tab(depth-1) + "}\n\n"
 
-		structContent += fmt.Sprintf("func (%s) %s() string {\n",
-			tableName, "TableName")
-		structContent += fmt.Sprintf("%sreturn \"%s\"\n",
-			tab(depth), tableRealName)
-		structContent += "}\n\n"
-
-		// 添加 method 获取真实表名
-		if t.realNameMethod != "" {
-			structContent += fmt.Sprintf("func (*%s) %s() string {\n",
-				tableName, t.realNameMethod)
+			structContent += fmt.Sprintf("func (%s) %s() string {\n",
+				tableName, "TableName")
 			structContent += fmt.Sprintf("%sreturn \"%s\"\n",
 				tab(depth), tableRealName)
 			structContent += "}\n\n"
+
+			// 添加 method 获取真实表名
+			if t.realNameMethod != "" {
+				structContent += fmt.Sprintf("func (*%s) %s() string {\n",
+					tableName, t.realNameMethod)
+				structContent += fmt.Sprintf("%sreturn \"%s\"\n",
+					tab(depth), tableRealName)
+				structContent += "}\n\n"
+			}
 		}
+
+		// 如果有引入 time.Time, 则需要引入 time 包
+		var importContent string
+		if strings.Contains(structContent, "time.Time") {
+			importContent = "import \"time\"\n\n"
+		}
+		fmt.Println(packageName)
+		fmt.Println(importContent)
+		fmt.Println(structContent)
+
+		fmt.Println(fmt.Sprintf("\n\n ************************************************** end convert %s ************************************************** \n\n", inputTableName))
+
+		// 写入文件struct
+		var savePath = t.savePath
+		// 是否指定保存路径
+		if savePath == "" {
+			continue
+		}
+
+		err = func(inputTableName string) error {
+
+			filePath := fmt.Sprintf("%s/%s.go", savePath, inputTableName)
+			f, err := os.Create(filePath)
+			if err != nil {
+				fmt.Println("Can not write file")
+				return err
+			}
+
+			defer func() {
+				_ = f.Close()
+			}()
+
+			_, err = f.WriteString(packageName + importContent + structContent)
+			if err != nil {
+				return err
+			}
+
+			cmd := exec.Command("gofmt", "-w", filePath)
+			if err = cmd.Run(); err != nil {
+				return err
+			}
+
+			return nil
+		}(inputTableName)
+
+		if err != nil {
+			panic(err)
+		}
+
 	}
-
-	// 如果有引入 time.Time, 则需要引入 time 包
-	var importContent string
-	if strings.Contains(structContent, "time.Time") {
-		importContent = "import \"time\"\n\n"
-	}
-	fmt.Println(packageName)
-	fmt.Println(importContent)
-	fmt.Println(structContent)
-
-	fmt.Println("\n\n ************************************************** end convert table ************************************************** \n\n")
-
-	// 写入文件struct
-	var savePath = t.savePath
-	// 是否指定保存路径
-	if savePath == "" {
-		return nil
-		savePath = "model.go"
-	}
-	filePath := fmt.Sprintf("%s", savePath)
-	f, err := os.Create(filePath)
-	if err != nil {
-		fmt.Println("Can not write file")
-		return err
-	}
-	defer f.Close()
-
-	f.WriteString(packageName + importContent + structContent)
-
-	cmd := exec.Command("gofmt", "-w", filePath)
-	cmd.Run()
 
 	return nil
 }
@@ -252,23 +279,24 @@ type column struct {
 	Extra         string
 }
 
-// Function for fetching schema definition of passed table
-func (t *Table2Struct) getColumns(table ...string) (tableColumns map[string][]column, err error) {
+// Function for fetching schema definition of passed tables
+func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]column, err error) {
 	tableColumns = make(map[string][]column)
 	// sql
 	var sqlStr = `SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE, COLUMN_KEY, IS_NULLABLE,EXTRA
 		FROM information_schema.COLUMNS 
 		WHERE table_schema = DATABASE()`
 	// 是否指定了具体的table
-	if t.table != "" {
-		sqlStr += fmt.Sprintf(" AND TABLE_NAME = '%s'", t.prefix+t.table)
-	}
+	//if t.tables != "" {
+	//	sqlStr += fmt.Sprintf(" AND TABLE_NAME = '%s'", t.prefix+t.tables)
+	//}
+	sqlStr += fmt.Sprintf(" AND TABLE_NAME = '%s'", t.prefix+table)
 	// sql排序
 	sqlStr += " order by TABLE_NAME asc, ORDINAL_POSITION asc"
 
 	rows, err := t.db.Query(sqlStr)
 	if err != nil {
-		fmt.Println("Error reading table information: ", err.Error())
+		fmt.Println("Error reading tables information: ", err.Error())
 		return
 	}
 

@@ -11,32 +11,35 @@
 ```
 Usage of t2s:
   -H string
-    	mysql host (自定义必传模式)
+    	mysql host (dsn模式必传)
   -P string
-    	mysql port (自定义必传模式)
+    	mysql port (dsn模式必传)
   -c string
     	配置类型 apollo (从apollo读取mysql配置)  dsn (自定义mysql配置) (default "apollo")
   -db string
     	数据库名
   -out string
-    	生成文件地址,不指定则不生成,直接输出到终端
+    	生成文件地址,不指定则不生成
   -p string
-    	mysql password (自定义必传模式)
+    	mysql password (dsn必传模式)
   -package string
     	生成文件的packageName (default "po")
   -t string
-    	表名
+    	表名, 多表按照 ',' 隔开
   -u string
-    	mysql username (自定义必传模式)
+    	mysql username (dsn必传模式)
 ```
 
 ### Example
 ```
 自动生成payment库refund表的映射文件
 
-从apollo读取Mysql配置
+从apollo读取Mysql配置(单表生成)
 
 t2s -db payment -t refund -out ./refund.go
+
+从apollo读取Mysql配置(多表生成)
+t2s -db payment -t refund,refund_detail,payment_config, -out ./refund.go
 
 自定义Mysql配置
 

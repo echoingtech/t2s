@@ -16,35 +16,33 @@ import (
 type ConfigType string
 
 const (
-	Template = "%s:%s@tcp(%s)/%s?charset=utf8"
-	ConfigTypeDSN string = "dsn"
+	Template                = "%s:%s@tcp(%s)/%s?charset=utf8"
+	ConfigTypeDSN    string = "dsn"
 	ConfigTypeApollo string = "apollo"
 )
 
 func main() {
 
-
 	var (
-		configType string
-		dbName, tableName string
-		user,pswd string
-		host, port string
-		outPath string
-		packageName string
+		configType         string
+		dbName, tableNames string
+		user, pswd         string
+		host, port         string
+		outPath            string
+		packageName        string
 	)
-
 
 	flag.StringVar(&user, "u", user, "mysql username (dsn必传模式)")
 
 	flag.StringVar(&pswd, "p", pswd, "mysql password (dsn必传模式)")
 
-	flag.StringVar(&host, "H", host, "mysql host (dsn必传模式)")
+	flag.StringVar(&host, "H", host, "mysql host (dsn模式必传)")
 
-	flag.StringVar(&port, "P", port, "mysql port (dsn必传模式)")
+	flag.StringVar(&port, "P", port, "mysql port (dsn模式必传)")
 
 	flag.StringVar(&dbName, "db", dbName, "数据库名")
 
-	flag.StringVar(&tableName, "t", tableName, "表名")
+	flag.StringVar(&tableNames, "t", tableNames, "表名, 多表按照 ',' 隔开")
 
 	flag.StringVar(&outPath, "out", outPath, "生成文件地址,不指定则不生成")
 
@@ -63,8 +61,8 @@ func main() {
 		}
 	}()
 
-	if len(dbName) <= 0 || len(tableName) <= 0 {
-		err = log4go.Error("必须指定dbName, tableName")
+	if len(dbName) <= 0 || len(tableNames) <= 0 {
+		err = log4go.Error("必须指定dbName, tableNames")
 		return
 	}
 
@@ -94,7 +92,7 @@ func main() {
 			err = log4go.Error("自定义模式必须指定 mysql password")
 			return
 		}
-		mysqlStr = LoadFromDSN(user,pswd,host,port,dbName)
+		mysqlStr = LoadFromDSN(user, pswd, host, port, dbName)
 	default:
 		flag.Usage()
 		return
@@ -102,7 +100,7 @@ func main() {
 
 	fmt.Println("使用 ", configType, " 模式 convert table")
 
-	func()  {
+	func() {
 
 		t2s := src.NewTable2Struct()
 		if len(outPath) > 0 {
@@ -114,13 +112,14 @@ func main() {
 		}
 
 		err := t2s.Dsn(mysqlStr).
-			Table(tableName).
+			Tables(tableNames).
 			PackageName(packageName).
 			Run()
 
 		if err != nil {
 			_ = log4go.Error("t2s error: %v", err)
 		}
+
 	}()
 
 }
@@ -152,13 +151,12 @@ func LoadFromApollo(mysqlName string) (string, error) {
 
 	db := conf.Instances[0]
 
-
 	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, mysqlName)
 	return dsn, nil
 
 }
 
 func LoadFromDSN(user, pswd, host, port, dbname string) string {
-	server := host+":"+port
+	server := host + ":" + port
 	return fmt.Sprintf(Template, user, pswd, server, dbname)
 }
