@@ -38,14 +38,14 @@ apollo 模式需要内网环境
 
 从apollo读取Mysql配置(单表生成)
 
-t2s -db payment -t refund -out ./refund.go
+t2s -db payment  -out ./  -t refund
 
 从apollo读取Mysql配置(多表生成)
-t2s -db payment -t refund,refund_detail,payment_config, -out ./refund.go
+t2s -db payment  -out ./  -t refund,refund_detail,payment_config
 
 自定义Mysql配置
 
-t2s -c dsn -H 127.0.0.1 -P 3306 -db payment -t refund -u username -p password -out ./refund.go
+t2s -c dsn -H 127.0.0.1 -P 3306 -db payment  -u username -p password -out ./  -t refund
 
 ```
 ### Result
