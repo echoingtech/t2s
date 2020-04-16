@@ -151,7 +151,8 @@ func LoadFromApollo(mysqlName string) (string, error) {
 
 	db := conf.Instances[0]
 
-	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, mysqlName)
+	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, db.DB)
+	//fmt.Println("========>", dsn)
 	return dsn, nil
 
 }
