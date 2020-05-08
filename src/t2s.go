@@ -46,6 +46,7 @@ var typeForMysqlToGo = map[string]string{
 	"tinyblob":           "string",
 	"mediumblob":         "string",
 	"longblob":           "string",
+	"json":               "string",
 	"date":               "time.Time", // time.Time or string
 	"datetime":           "time.Time", // time.Time or string
 	"timestamp":          "time.Time", // time.Time or string
