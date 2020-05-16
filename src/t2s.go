@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"regexp"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -166,7 +168,7 @@ func (t *Table2Struct) Run() error {
 				tableName = strings.ToUpper(tableName[0:1])
 			default:
 				var str string
-				tableNames := strings.Split(tableName, "_")
+				tableNames := regexp.MustCompile("[-_]").Split(tableName, -1)
 				for _, name := range tableNames {
 					str += strings.ToUpper(name[0:1]) + name[1:]
 				}
@@ -208,6 +210,7 @@ func (t *Table2Struct) Run() error {
 		if strings.Contains(structContent, "time.Time") {
 			importContent = "import \"time\"\n\n"
 		}
+
 		fmt.Println(packageName)
 		fmt.Println(importContent)
 		fmt.Println(structContent)
@@ -222,8 +225,22 @@ func (t *Table2Struct) Run() error {
 		}
 
 		err = func(inputTableName string) error {
+			if filepath.Ext(savePath) != ".go" {
+				savePath = filepath.Join(savePath, inputTableName+".go")
+			}
 
-			filePath := fmt.Sprintf("%s/%s.go", savePath, inputTableName)
+			wd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+
+			filePath := filepath.Join(wd, savePath)
+
+			// 确保目录存在
+			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+				return err
+			}
+
 			f, err := os.Create(filePath)
 			if err != nil {
 				fmt.Println("Can not write file")
@@ -240,7 +257,8 @@ func (t *Table2Struct) Run() error {
 			}
 
 			cmd := exec.Command("gofmt", "-w", filePath)
-			if err = cmd.Run(); err != nil {
+			if stderr, err := cmd.CombinedOutput(); err != nil {
+				fmt.Errorf("gofmt failed: %s", string(stderr))
 				return err
 			}
 
@@ -248,6 +266,9 @@ func (t *Table2Struct) Run() error {
 		}(inputTableName)
 
 		if err != nil {
+			fmt.Println("-------------------")
+			fmt.Println(err)
+			fmt.Println("-------------------")
 			panic(err)
 		}
 
