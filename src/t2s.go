@@ -14,10 +14,11 @@ import (
 )
 
 const (
-	pk       = "PRI"
-	unique   = "UNI"
-	nullAble = "YES"
-	autoincr = "auto_increment"
+	pk        = "PRI"
+	unique    = "UNI"
+	nullAble  = "YES"
+	autoincr  = "auto_increment"
+	on_update = "on update CURRENT_TIMESTAMP"
 )
 
 //map for converting mysql type to golang types
@@ -332,7 +333,7 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 			fmt.Println(err.Error())
 			return
 		}
-
+		//fmt.Println("=====>", col)
 		//col.Json = strings.ToLower(col.ColumnName)
 		col.Tag = col.ColumnName
 		col.ColumnComment = col.ColumnComment
@@ -360,7 +361,12 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 		} else {
 			colStr = colStr + " notnull "
 		}
+
+		if col.Extra == on_update {
+			colStr = colStr + " created "
+		}
 		colStr = colStr + fmt.Sprintf("'%s'\"`", col.Tag)
+
 		col.Tag = colStr
 		//col.Tag = fmt.Sprintf(" '%s'\"`", "xorm", col.ColumnType, col.Tag)
 
