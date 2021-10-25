@@ -14,11 +14,12 @@ import (
 )
 
 const (
-	pk        = "PRI"
-	unique    = "UNI"
-	nullAble  = "YES"
-	autoincr  = "auto_increment"
-	on_update = "on update CURRENT_TIMESTAMP"
+	pk                = "PRI"
+	unique            = "UNI"
+	nullAble          = "YES"
+	autoincr          = "auto_increment"
+	on_update         = "on update CURRENT_TIMESTAMP"
+	current_timestamp = "CURRENT_TIMESTAMP"
 )
 
 //map for converting mysql type to golang types
@@ -364,6 +365,10 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 
 		if col.Extra == on_update {
 			colStr = colStr + " updated "
+		}
+
+		if col.Extra == current_timestamp {
+			colStr = colStr + " created "
 		}
 		colStr = colStr + fmt.Sprintf("'%s'\"`", col.Tag)
 
