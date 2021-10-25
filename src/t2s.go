@@ -363,7 +363,7 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 		}
 
 		if col.Extra == on_update {
-			colStr = colStr + " created "
+			colStr = colStr + " updated "
 		}
 		colStr = colStr + fmt.Sprintf("'%s'\"`", col.Tag)
 
