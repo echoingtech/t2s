@@ -311,7 +311,7 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 	var sqlStr = `
 		SELECT 
 		COLUMN_NAME, 
-		COLUMN_TYPE, 
+		DATA_TYPE, 
 		IS_NULLABLE,
 		TABLE_NAME,
 		COLUMN_COMMENT,
