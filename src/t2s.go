@@ -301,13 +301,25 @@ type column struct {
 	Tag           string
 	ColumnType    string
 	Extra         string
+	ColumnDefault *string
 }
 
 // Function for fetching schema definition of passed tables
 func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]column, err error) {
 	tableColumns = make(map[string][]column)
 	// sql
-	var sqlStr = `SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE, COLUMN_KEY, IS_NULLABLE,EXTRA
+	var sqlStr = `
+		SELECT 
+		COLUMN_NAME, 
+		COLUMN_TYPE, 
+		IS_NULLABLE,
+		TABLE_NAME,
+		COLUMN_COMMENT,
+		COLUMN_TYPE,
+		COLUMN_KEY,
+		IS_NULLABLE,
+		EXTRA,
+		COLUMN_DEFAULT
 		FROM information_schema.COLUMNS 
 		WHERE table_schema = DATABASE()`
 	// 是否指定了具体的table
@@ -328,7 +340,7 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 
 	for rows.Next() {
 		col := column{}
-		err = rows.Scan(&col.ColumnName, &col.Type, &col.Nullable, &col.TableName, &col.ColumnComment, &col.ColumnType, &col.Key, &col.NullAble, &col.Extra)
+		err = rows.Scan(&col.ColumnName, &col.Type, &col.Nullable, &col.TableName, &col.ColumnComment, &col.ColumnType, &col.Key, &col.NullAble, &col.Extra, &col.ColumnDefault)
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -363,13 +375,16 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 			colStr = colStr + " notnull "
 		}
 
+		fmt.Println("aa---", col.ColumnName, col)
+
 		if col.Extra == on_update {
 			colStr = colStr + " updated "
 		}
 
-		if col.Extra == current_timestamp {
+		if col.ColumnDefault != nil && *col.ColumnDefault == current_timestamp && col.Extra == "" {
 			colStr = colStr + " created "
 		}
+
 		colStr = colStr + fmt.Sprintf("'%s'\"`", col.Tag)
 
 		col.Tag = colStr
