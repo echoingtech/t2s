@@ -375,8 +375,6 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 			colStr = colStr + " notnull "
 		}
 
-		fmt.Println("aa---", col.ColumnName, col)
-
 		if col.Extra == on_update {
 			colStr = colStr + " updated "
 		}
