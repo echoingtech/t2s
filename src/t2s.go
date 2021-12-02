@@ -184,9 +184,10 @@ func (t *Table2Struct) Run() error {
 				// 字段注释
 				var clumnComment string
 				if v.ColumnComment != "" {
-					strings.ReplaceAll(v.ColumnComment, "\r", "")
-					strings.ReplaceAll(v.ColumnComment, "\n", "  ")
-					clumnComment = fmt.Sprintf(" // %s", v.ColumnComment)
+					// 如果字段注释中包含了回车 最终生成的注释会有问题 此处解决
+					clumnComment = strings.ReplaceAll(v.ColumnComment, "\r", "")
+					clumnComment = strings.ReplaceAll(clumnComment, "\n", "  ")
+					clumnComment = fmt.Sprintf(" // %s", clumnComment)
 				}
 				structContent += fmt.Sprintf("%s%s %s %s%s\n",
 					tab(depth), v.ColumnName, v.Type, v.Tag, clumnComment)
