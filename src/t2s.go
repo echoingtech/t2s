@@ -355,7 +355,7 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 		col.ColumnComment = col.ColumnComment
 		col.ColumnName = t.camelCase(col.ColumnName)
 		col.Type = typeForMysqlToGo[col.Type]
-		col.Tag = strings.ToLower(col.Tag)
+		//col.Tag = strings.ToLower(col.Tag)
 
 		//if t.enableJsonTag {
 		//	col.Tag = fmt.Sprintf("`%s:\"%s\" json:\"%s\"`", "xorm", col.Tag, col.Tag)
