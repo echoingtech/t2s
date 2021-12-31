@@ -349,19 +349,14 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 			fmt.Println(err.Error())
 			return
 		}
-		//fmt.Println("=====>", col)
-		//col.Json = strings.ToLower(col.ColumnName)
 		col.Tag = col.ColumnName
 		col.ColumnComment = col.ColumnComment
 		col.ColumnName = t.camelCase(col.ColumnName)
-		col.Type = typeForMysqlToGo[col.Type]
-		//col.Tag = strings.ToLower(col.Tag)
-
-		//if t.enableJsonTag {
-		//	col.Tag = fmt.Sprintf("`%s:\"%s\" json:\"%s\"`", "xorm", col.Tag, col.Tag)
-		//} else {
-		//	col.Tag = fmt.Sprintf("`%s:\"%s %s '%s'\"`", "xorm", col.ColumnType, col.Tag)
-		//}
+		if col.NullAble == nullAble {
+			col.Type = "*" + typeForMysqlToGo[col.Type]
+		} else {
+			col.Type = typeForMysqlToGo[col.Type]
+		}
 		colStr := fmt.Sprintf("`%s:\"%s", "xorm", col.ColumnType)
 		if col.Key == pk {
 			colStr = colStr + " pk "
