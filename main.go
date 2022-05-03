@@ -3,14 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-
-	"github.com/echoingtech/log4go"
-	"github.com/echoingtech/t2s/src"
-
-	"github.com/echoingtech/hakot/mysql"
 	"gopkg.in/yaml.v2"
 
-	"github.com/echoingtech/hakot/config"
+	"github.com/echoingtech/go-micro/log4go"
+	"github.com/echoingtech/t2s/src"
+
+	"github.com/echoingtech/go-micro/hakot/config"
+	"github.com/echoingtech/go-micro/hakot/mysql"
 )
 
 type ConfigType string
