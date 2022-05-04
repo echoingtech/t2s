@@ -352,11 +352,14 @@ func (t *Table2Struct) getColumns(table string) (tableColumns map[string][]colum
 		col.Tag = col.ColumnName
 		col.ColumnComment = col.ColumnComment
 		col.ColumnName = t.camelCase(col.ColumnName)
+		typeTemp := ""
 		if col.NullAble == nullAble {
-			col.Type = "*" + typeForMysqlToGo[col.Type]
-		} else {
-			col.Type = typeForMysqlToGo[col.Type]
+			typeTemp = "*"
 		}
+		if strings.Contains(col.ColumnType, "unsigned") {
+			typeTemp = typeTemp + "u"
+		}
+		col.Type = typeTemp + typeForMysqlToGo[col.Type]
 		colStr := fmt.Sprintf("`%s:\"%s", "xorm", col.ColumnType)
 		if col.Key == pk {
 			colStr = colStr + " pk "
