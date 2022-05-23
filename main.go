@@ -15,7 +15,7 @@ import (
 type ConfigType string
 
 const (
-	Template                = "%s:%s@tcp(%s)/%s?charset=utf8"
+	Template                = "%s:%s@tcp(%s:%s)/%s?charset=utf8"
 	ConfigTypeDSN    string = "dsn"
 	ConfigTypeApollo string = "apollo"
 )
@@ -150,7 +150,7 @@ func LoadFromApollo(mysqlName string) (string, error) {
 
 	db := conf.Instances[0]
 
-	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, db.DB)
+	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, db.Port, db.DB)
 	//fmt.Println("========>", dsn)
 	return dsn, nil
 
