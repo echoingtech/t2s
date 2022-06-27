@@ -3,16 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"g.echo.tech/dev/go-micro/hakot/config"
+	"g.echo.tech/dev/go-micro/hakot/mysql"
+	"g.echo.tech/dev/go-micro/log4go"
+	"g.echo.tech/dev/t2s/src"
 	"gopkg.in/yaml.v2"
-
-	"github.com/echoingtech/go-micro/log4go"
-	"github.com/echoingtech/t2s/src"
-
-	"github.com/echoingtech/go-micro/hakot/config"
-	"github.com/echoingtech/go-micro/hakot/mysql"
 )
-
-type ConfigType string
 
 const (
 	Template                = "%s:%s@tcp(%s:%s)/%s?charset=utf8"
@@ -151,7 +147,6 @@ func LoadFromApollo(mysqlName string) (string, error) {
 	db := conf.Instances[0]
 
 	dsn := fmt.Sprintf(Template, db.UserID, db.Password, db.Server, db.Port, db.DB)
-	//fmt.Println("========>", dsn)
 	return dsn, nil
 
 }

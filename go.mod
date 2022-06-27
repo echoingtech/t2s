@@ -1,9 +1,9 @@
-module github.com/echoingtech/t2s
+module g.echo.tech/dev/t2s
 
-go 1.12
+go 1.16
 
 require (
-	github.com/echoingtech/go-micro v1.33.10
+	g.echo.tech/dev/go-micro v1.41.16
 	github.com/go-sql-driver/mysql v1.6.0
 	gopkg.in/yaml.v2 v2.4.0
 )
